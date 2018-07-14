@@ -20,7 +20,7 @@ setup(
     version=pkg_info.__version__,
     license=pkg_info.__license__,
     author=pkg_info.__author__,
-    # url=""
+    url="https://github.com/SiLeader/pymvc",
 
     description="MVC framework for Python",
     long_description=readme,
