@@ -1,7 +1,7 @@
 Change Log
 =================
 
-## 0.1.1
+## 0.1.2
 ### Added
 + hash function support
 + HashType support
