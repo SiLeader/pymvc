@@ -4,6 +4,7 @@
 import typing
 import abc
 import uuid
+import datetime
 
 
 class ModelTypeBase(abc.ABC):
@@ -138,9 +139,30 @@ class ListType(ModelTypeBase):
     """
     List type
     """
+    def __init__(self, dt: typing.Type, *args,
+                 primary: bool=False, non_null: bool=False, unique: bool=False, default=None, **kwargs):
+        super(ListType, self).__init__(primary, non_null, unique, default)
+
+        from .model_base import Model
+        if issubclass(dt, Model):
+            self.__data_instance = ForeignType(dt)
+        elif issubclass(dt, ModelTypeBase):
+            self.__data_instance = dt(*args, **kwargs)
+        self.__data_type = dt
+
     @property
     def type(self) -> typing.Type:
         return list
+
+    def create_instance(self, value):
+        if issubclass(self.__data_type, ModelTypeBase):
+            return [self.__data_instance.create_instance(v) for v in value]
+        return value
+
+    def to_model_data(self, value):
+        if issubclass(self.__data_type, ModelTypeBase):
+            return [self.__data_instance.to_model_data(v) for v in value]
+        return value
 
 
 class ForeignType(ModelTypeBase):
@@ -179,3 +201,47 @@ class ForeignType(ModelTypeBase):
     @property
     def type(self):
         return self.__model
+
+
+class EnumType(ModelTypeBase):
+    def __init__(self, enum_type, primary: bool=False, non_null: bool=False, unique: bool=False, default=None):
+        super(EnumType, self).__init__(primary, non_null, unique, default)
+
+        self.__enum = enum_type
+
+    def create_instance(self, value):
+        return self.__enum(value)
+
+    def to_model_data(self, value):
+        return value.value
+
+    @property
+    def type(self):
+        return self.__enum
+
+
+class DatetimeType(ModelTypeBase):
+    @property
+    def type(self):
+        return datetime.datetime
+
+
+class BoolType(ModelTypeBase):
+    @property
+    def type(self):
+        return bool
+
+
+class HashType(ModelTypeBase):
+    @property
+    def type(self):
+        from .hash_function import Hashed
+        return Hashed
+
+    def create_instance(self, value):
+        return self.type(value)
+
+    def to_model_data(self, value):
+        return str(value)
+
+

@@ -4,8 +4,12 @@
 import typing
 
 from flask import render_template
+from flask import url_for as flask_url_for
 
 from . import wsgi, controller
+
+
+__routes = {}
 
 
 def add_route(path: str, ctrl: typing.Union[controller.Controller, typing.Type]):
@@ -34,6 +38,8 @@ def add_route(path: str, ctrl: typing.Union[controller.Controller, typing.Type])
         return internal
 
     endpoint = "{}:{}".format(path, ctrl.__class__.__name__)
+    __routes[ctrl.__class__.__name__] = endpoint+":GET"
+
     wsgi.app.add_url_rule(path, view_func=vf(ctrl.get), methods=["GET"], endpoint=endpoint+":GET")
     wsgi.app.add_url_rule(path, view_func=vf(ctrl.post), methods=["POST"], endpoint=endpoint+":POST")
     wsgi.app.add_url_rule(path, view_func=vf(ctrl.put), methods=["PUT"], endpoint=endpoint+":PUT")
@@ -48,3 +54,18 @@ def route(path: str):
     def route_deco(cls):
         add_route(path, cls)
     return route_deco
+
+
+def url_for(ctrl: typing.Union[controller.Controller, str, typing.Type], **kwargs):
+    if not isinstance(ctrl, str):
+        if isinstance(ctrl, controller.Controller):
+            ctrl = ctrl.__class__.__name__
+        else:
+            ctrl = ctrl.__name__
+    return flask_url_for(__routes[ctrl], **kwargs)
+
+
+@wsgi.app.context_processor
+def url_for_function():
+    return {"url_for": url_for}
+    pass

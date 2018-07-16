@@ -82,3 +82,6 @@ class Controller(abc.ABC):
         :return: response
         """
         return abort(405)
+
+    def __hash__(self):
+        return hash(self.__class__.__name__)

@@ -100,6 +100,7 @@ class Model(abc.ABC):
 
     @classmethod
     def get_primary_key_name(cls):
+        cls._setup()
         name, _ = cls.__primary_key
         return name
 
