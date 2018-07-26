@@ -25,16 +25,17 @@ class Model(abc.ABC):
     def __init__(self, **key_value):
         cls = self.__class__
 
-        if "__data" not in dir(cls):
-            cls.__data = []
-            cls.__primary_key = None
+        # if "__data" not in dir(cls):
+        #     cls.__data = []
+        #     cls.__primary_key = None
 
-            for name in dir(self):
-                ty = getattr(self, name)
-                if isinstance(ty, datatypes.ModelTypeBase):
-                    cls.__data.append((name, ty))
-                    if ty.primary:
-                        cls.__primary_key = (name, ty)
+        #     for name in dir(self):
+        #         ty = getattr(self, name)
+        #         if isinstance(ty, datatypes.ModelTypeBase):
+        #             cls.__data.append((name, ty))
+        #             if ty.primary:
+        #                 cls.__primary_key = (name, ty)
+        cls._setup()
 
         for name, ty in cls.__data:
             value = ty.default
@@ -47,6 +48,9 @@ class Model(abc.ABC):
         if "__data" not in dir(cls):
             cls.__data = []
             cls.__primary_key = None
+            col = cls.__collection()
+
+            indices = col.list_indexes()
 
             for name in dir(cls):
                 ty = getattr(cls, name)
@@ -54,6 +58,9 @@ class Model(abc.ABC):
                     cls.__data.append((name, ty))
                     if ty.primary:
                         cls.__primary_key = (name, ty)
+                    if ty.unique:
+                        if name in indices:
+                            col.create_index(name, unique=True)
 
     @classmethod
     def __collection(cls):
@@ -90,13 +97,17 @@ class Model(abc.ABC):
 
         return [cls(**data) for data in cls.__collection().find(query)]
 
-    def save(self):
+    def save(self) -> bool:
         cls = self.__class__
         primary_name, _ = cls.__primary_key
         data = {}
         for name, ty in cls.__data:
-            data[name] = ty.to_model_data(getattr(self, name))
-        self.__collection().update_one({primary_name: data[primary_name]}, {"$set": data}, upsert=True)
+            datum = ty.to_model_data(getattr(self, name))
+            if datum is None and ty.non_null:
+                return False
+            data[name] = datum
+        res = self.__collection().update_one({primary_name: data[primary_name]}, {"$set": data}, upsert=True)
+        return res.acknowledged
 
     @classmethod
     def get_primary_key_name(cls):

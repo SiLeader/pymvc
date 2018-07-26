@@ -122,10 +122,18 @@ class _FlaskSetting:
 
     @property
     def root_directory(self) -> str:
+        """
+        get Flask root path
+        :return: root path
+        """
         return wsgi.app.root_path
 
     @root_directory.setter
     def root_directory(self, value: str):
+        """
+        set Flask root path
+        :param value: root path
+        """
         wsgi.app.root_path = value
 
 

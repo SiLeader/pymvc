@@ -5,6 +5,7 @@ import typing
 import abc
 import uuid
 import datetime
+import enum
 
 
 class ModelTypeBase(abc.ABC):
@@ -87,6 +88,10 @@ class ModelTypeBase(abc.ABC):
 
     @property
     def default(self):
+        """
+        get default value
+        :return: default value
+        """
         return self.__default
 
 
@@ -146,6 +151,8 @@ class ListType(ModelTypeBase):
         from .model_base import Model
         if issubclass(dt, Model):
             self.__data_instance = ForeignType(dt)
+        elif issubclass(dt, enum.Enum):
+            self.__data_instance = EnumType(dt)
         elif issubclass(dt, ModelTypeBase):
             self.__data_instance = dt(*args, **kwargs)
         self.__data_type = dt
@@ -204,6 +211,9 @@ class ForeignType(ModelTypeBase):
 
 
 class EnumType(ModelTypeBase):
+    """
+    enum.Enum model value type
+    """
     def __init__(self, enum_type, primary: bool=False, non_null: bool=False, unique: bool=False, default=None):
         super(EnumType, self).__init__(primary, non_null, unique, default)
 
@@ -221,18 +231,27 @@ class EnumType(ModelTypeBase):
 
 
 class DatetimeType(ModelTypeBase):
+    """
+    datetime.datetime model value type
+    """
     @property
     def type(self):
         return datetime.datetime
 
 
 class BoolType(ModelTypeBase):
+    """
+    bool model value type
+    """
     @property
     def type(self):
         return bool
 
 
 class HashType(ModelTypeBase):
+    """
+    hashed model value type
+    """
     @property
     def type(self):
         from .hash_function import Hashed

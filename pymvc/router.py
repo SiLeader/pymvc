@@ -57,6 +57,12 @@ def route(path: str):
 
 
 def url_for(ctrl: typing.Union[controller.Controller, str, typing.Type], **kwargs):
+    """
+    get url for Controller
+    :param ctrl: Controller instance or name
+    :param kwargs: url fragment data
+    :return: url for Controller
+    """
     if not isinstance(ctrl, str):
         if isinstance(ctrl, controller.Controller):
             ctrl = ctrl.__class__.__name__
@@ -67,5 +73,8 @@ def url_for(ctrl: typing.Union[controller.Controller, str, typing.Type], **kwarg
 
 @wsgi.app.context_processor
 def url_for_function():
+    """
+    add url_for to Jinja2
+    :return: Jinja2 function
+    """
     return {"url_for": url_for}
-    pass

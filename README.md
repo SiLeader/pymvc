@@ -67,7 +67,7 @@ if __name__ == '__main__':
 ### Controller
 Controller class has `VIEW` (class variable) and `get`, `post`, `put` and `delete` instance methods.
 if you want to support GET method, override `get` method.
-these functions' default operation is `return abort(405)`.
+these functions' default operation is `return abort(404)`.
 
 ### Model
 Model class is ORM for MongoDB (using pymongo).

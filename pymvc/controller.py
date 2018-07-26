@@ -57,7 +57,7 @@ class Controller(abc.ABC):
         :param kwargs: url parameter
         :return: response
         """
-        return abort(405)
+        return abort(404)
 
     def post(self, **kwargs):
         """
@@ -65,7 +65,7 @@ class Controller(abc.ABC):
         :param kwargs: url parameter
         :return: response
         """
-        return abort(405)
+        return abort(404)
 
     def put(self, **kwargs):
         """
@@ -73,7 +73,7 @@ class Controller(abc.ABC):
         :param kwargs: url parameter
         :return: response
         """
-        return abort(405)
+        return abort(404)
 
     def delete(self, **kwargs):
         """
@@ -81,7 +81,11 @@ class Controller(abc.ABC):
         :param kwargs: url parameter
         :return: response
         """
-        return abort(405)
+        return abort(404)
 
     def __hash__(self):
+        """
+        hash function
+        :return: hash value of Controller name
+        """
         return hash(self.__class__.__name__)

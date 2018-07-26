@@ -1,6 +1,17 @@
 Change Log
 =================
 
+## 0.1.3
+### Added
++ unique data support
++ non null data support
++ add document comment
+
+### Changed
++ ListType updated (support Enum list)
++ Default status code to 404
++ Update README.md (default status code 405 to 404)
+
 ## 0.1.2
 ### Added
 + hash function support

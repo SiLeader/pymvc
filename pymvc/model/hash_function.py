@@ -11,6 +11,11 @@ __V1_STRETCH_COUNT = 10000
 
 
 def __version0(target: str) -> str:
+    """
+    hash function version 0
+    :param target: input data
+    :return: hashed data
+    """
     bytes_ = target.encode(encoding="utf-8")
     salt = [
         base64.b16encode(bytes_).decode(encoding="utf-8"),
@@ -36,16 +41,32 @@ __HASH_FUNCTIONS = [
 
 
 def compute_hash(target: str, ver=None) -> str:
+    """
+    compute hash value
+    :param target: input data
+    :param ver: hash function version. None is latest version
+    :return: hashed data
+    """
     if ver is None:
         ver = -1
     return __HASH_FUNCTIONS[ver](target)
 
 
 def latest_version() -> int:
+    """
+    latest hash function version
+    :return: latest version number
+    """
     return len(__HASH_FUNCTIONS) - 1
 
 
 def check(hashed: str, non_hashed: str) -> typing.Tuple[bool, typing.Optional[str]]:
+    """
+    check correct value and get updated hashed value
+    :param hashed: value 1
+    :param non_hashed: value 2
+    :return: (is corrected, updated value)
+    """
     ver = version(hashed)
     non_ver = version(non_hashed)
     new_value = None
@@ -75,6 +96,11 @@ def check(hashed: str, non_hashed: str) -> typing.Tuple[bool, typing.Optional[st
 
 
 def version(target: str) -> typing.Optional[int]:
+    """
+    get hashed data version
+    :param target: hashed data
+    :return: hashed data version
+    """
     if target is None:
         return None
     match = re.match("\$(\d+)\$.+", target)
@@ -84,7 +110,15 @@ def version(target: str) -> typing.Optional[int]:
 
 
 class Hashed:
+    """
+    Hashed data type
+    """
     def __init__(self, data=None, ver=None):
+        """
+        constructor
+        :param data: data
+        :param ver: version
+        """
         if data is None:
             data = ""
         elif version(data) is None:
@@ -92,9 +126,19 @@ class Hashed:
         self.__data = data
 
     def __str__(self):
+        """
+        str operator
+        hashed data
+        :return: hashed data
+        """
         return self.__data
 
     def __eq__(self, other):
+        """
+        equal operator
+        :param other: opponent value
+        :return: is same
+        """
         if isinstance(other, Hashed):
             other = str(other)
         ok, new = check(self.__data, other)
